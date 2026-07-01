@@ -1,0 +1,180 @@
+
+    <!DOCTYPE html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <style>
+            body {
+                font-size: 14px;
+                font-family: 'Avenir Next', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                margin: 20px auto;
+                width: 1200px;
+            }
+
+            b {
+                font-weight: 600;
+            }
+
+            table {
+                width: 100%;
+                table-layout: fixed;
+            }
+
+            .ghost {
+                padding: 10px;
+                height: 150px;
+                width: 150px;
+                background-color: #FFFE00;
+                display: block;
+                margin: auto;
+                border-radius: 10px;
+            }
+
+            .leftpanel {
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                width: 300px;
+                color: #6c6c6c;
+                overflow-y: auto;
+            }
+
+            .leftpanel a {
+                text-decoration: none;
+                color: #6c6c6c;
+            }
+
+            .leftpanel ul {
+                margin-left: 20px;
+                padding: 0;
+            }
+
+            .leftpanel li {
+                cursor: pointer;
+                display: block;
+                padding: 11px 16px;
+            }
+
+            .leftpanel li:hover {
+                background-color: #f3f3f3;
+            }
+
+            .leftpanel li.active {
+                background-color: #f3f3f3;
+            }
+
+            .rightpanel th {
+                text-align: left
+            }
+
+            .rightpanel {
+                padding-left: 310px;
+                padding-top: 5px;
+            }
+
+            .rightpanel th, td {
+                padding: 15px;
+                font-weight: normal;
+            }
+            .hidden-div {
+                display: none;
+            }
+
+            .bold-headers th {
+                font-weight: 600;
+            }
+            .single_chat {
+                display: flex;
+                justify-content: space-between;
+                padding: 14px 28px;
+                border: none;
+                background-color: #FFFFFF;
+                cursor: pointer;
+                width: 100%;
+
+            }
+            .thread-list {
+                border-bottom: 0.5px solid;
+            }
+
+            .single_chat:hover {
+                background-color: #e3e3e3;
+            }
+            .thread-list:last-child{
+                border: none;
+            }
+            .icons {
+                left: 50%;
+                transform: translate(120px, 0%);
+                position: absolute;
+                padding-top: 15px;
+            }
+            .back-button {
+                min-height:30px;
+                min-width: 120px;
+                border:none;
+                padding-top: 20px;
+                cursor: pointer;
+            }
+
+            .saved {
+                background: #FFFC00;
+                border-radius: 100px;
+                width: 66px;
+                height:28px;
+                border: none;
+                justify-content: center;
+                align-items: center;
+                font-family: 'Avenir Next';
+                font-style: normal;
+                font-weight: 600;
+                font-size: 12px;
+                color: #845D00;
+                margin-top: 14px;
+                margin-right: 5px;
+                margin-bottom: 17px;
+            }
+        </style>
+    </head>
+    <html>
+    <body>
+    <div class="leftpanel"><img class="ghost" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPjFBcnRib2FyZCAxIGNvcHkgMjwvdGl0bGU+PGcgaWQ9IlBSSU1BUllfLV9HSE9TVCIgZGF0YS1uYW1lPSJQUklNQVJZIC0gR0hPU1QiPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTQxNy45MywzNDAuNzFjLTYwLjYxLTI5LjM0LTcwLjI3LTc0LjY0LTcwLjctNzgtLjUyLTQuMDctMS4xMS03LjI3LDMuMzgtMTEuNDEsNC4zMy00LDIzLjU0LTE1Ljg5LDI4Ljg3LTE5LjYxLDguODEtNi4xNiwxMi42OS0xMi4zMSw5LjgzLTE5Ljg3LTItNS4yMy02Ljg3LTcuMi0xMi03LjJhMjIuMywyMi4zLDAsMCwwLTQuODEuNTRjLTkuNjgsMi4xLTE5LjA4LDYuOTUtMjQuNTIsOC4yNmE4LjU2LDguNTYsMCwwLDEtMiwuMjdjLTIuOSwwLTQtMS4yOS0zLjcyLTQuNzguNjgtMTAuNTgsMi4xMi0zMS4yMy40NS01MC41Mi0yLjI5LTI2LjU0LTEwLjg1LTM5LjY5LTIxLTUxLjMyQzMxNi44LDEwMS40MywyOTQsNzcuMiwyNTAsNzcuMlMxODMuMjMsMTAxLjQzLDE3OC4zNSwxMDdjLTEwLjE4LDExLjYzLTE4LjczLDI0Ljc4LTIxLDUxLjMyLTEuNjcsMTkuMjktLjE3LDM5LjkzLjQ1LDUwLjUyLjIsMy4zMi0uODIsNC43OC0zLjcyLDQuNzhhOC42NCw4LjY0LDAsMCwxLTItLjI3Yy01LjQzLTEuMzEtMTQuODMtNi4xNi0yNC41MS04LjI2YTIyLjMsMjIuMywwLDAsMC00LjgxLS41NGMtNS4xNSwwLTEwLDItMTIsNy4yLTIuODYsNy41NiwxLDEzLjcxLDkuODQsMTkuODcsNS4zMywzLjcyLDI0LjU0LDE1LjYsMjguODcsMTkuNjEsNC40OCw0LjE0LDMuOSw3LjM0LDMuMzgsMTEuNDEtLjQzLDMuNDEtMTAuMSw0OC43MS03MC43LDc4LTMuNTUsMS43Mi05LjU5LDUuMzYsMS4wNiwxMS4yNCwxNi43Miw5LjI0LDI3Ljg1LDguMjUsMzYuNSwxMy44Miw3LjM0LDQuNzMsMywxNC45Myw4LjM0LDE4LjYxLDYuNTYsNC41MywyNS45NS0uMzIsNTEsNy45NSwyMSw2LjkyLDMzLjc2LDI2LjQ3LDcxLDI2LjQ3czUwLjM3LTE5LjY0LDcxLTI2LjQ3YzI1LTguMjcsNDQuNDMtMy40Miw1MS03Ljk1LDUuMzMtMy42OCwxLTEzLjg4LDguMzQtMTguNjEsOC42NS01LjU3LDE5Ljc3LTQuNTgsMzYuNS0xMy44MkM0MjcuNTIsMzQ2LjA3LDQyMS40OCwzNDIuNDMsNDE3LjkzLDM0MC43MVoiLz48cGF0aCBkPSJNNDQ0LjMsMzM3LjI2Yy0yLjcyLTcuNC03LjktMTEuMzYtMTMuOC0xNC42NC0xLjExLS42NS0yLjEzLTEuMTctMy0xLjU3LTEuNzYtLjkxLTMuNTYtMS43OS01LjM1LTIuNzItMTguMzktOS43NS0zMi43NS0yMi4wNS00Mi43MS0zNi42M2E4My4wNiw4My4wNiwwLDAsMS03LjMzLTEzYy0uODUtMi40My0uODEtMy44MS0uMi01LjA3YTguMjUsOC4yNSwwLDAsMSwyLjM1LTIuNDVjMy4xNi0yLjA5LDYuNDItNC4yMSw4LjYzLTUuNjQsMy45NC0yLjU1LDcuMDYtNC41Nyw5LjA3LTYsNy41NS01LjI4LDEyLjgzLTEwLjg5LDE2LjEzLTE3LjE2QTM0LjE3LDM0LjE3LDAsMCwwLDQwOS43OCwyMDRjLTUtMTMuMTYtMTcuNDMtMjEuMzMtMzIuNDktMjEuMzNhNDQuNzUsNDQuNzUsMCwwLDAtOS40NSwxYy0uODMuMTgtMS42Ni4zNy0yLjQ3LjU4LjE0LTktLjA2LTE4LjUtLjg2LTI3Ljg1LTIuODQtMzIuODctMTQuMzUtNTAuMS0yNi4zNS02My44NEExMDUsMTA1LDAsMCwwLDMxMS4zNyw3MUMyOTMuMTYsNjAuNiwyNzIuNTEsNTUuMzIsMjUwLDU1LjMyUzIwNi45NCw2MC42LDE4OC43MSw3MWExMDQuNjIsMTA0LjYyLDAsMCwwLTI2Ljg0LDIxLjZjLTEyLDEzLjc0LTIzLjUxLDMxLTI2LjM1LDYzLjg0LS44LDkuMzUtMSwxOC45LS44NywyNy44NS0uODEtLjIxLTEuNjMtLjQtMi40Ni0uNThhNDQuNzUsNDQuNzUsMCwwLDAtOS40NS0xYy0xNS4wNywwLTI3LjUyLDguMTctMzIuNSwyMS4zM2EzNC4yMSwzNC4yMSwwLDAsMCwxLjY1LDI4LjQxYzMuMzEsNi4yNyw4LjU5LDExLjg4LDE2LjE0LDE3LjE2LDIsMS40LDUuMTMsMy40Miw5LjA3LDYsMi4xMywxLjM4LDUuMjQsMy40LDguMjksNS40MmE4LjksOC45LDAsMCwxLDIuNjYsMi42N2MuNjQsMS4zMS42NiwyLjcyLS4yOSw1LjMyYTgyLjI5LDgyLjI5LDAsMCwxLTcuMjEsMTIuNzNjLTkuNzQsMTQuMjUtMjMuNjgsMjYuMzMtNDEuNDgsMzYtOS40Myw1LTE5LjIzLDguMzQtMjMuMzcsMTkuNTktMy4xMiw4LjQ5LTEuMDgsMTguMTUsNi44NSwyNi4yOWgwYTM5LjYzLDM5LjYzLDAsMCwwLDEwLDcuNTcsMTA4LjM1LDEwOC4zNSwwLDAsMCwyNC40Nyw5Ljc5LDE2LjE2LDE2LjE2LDAsMCwxLDQuOTQsMi4yMWMyLjg5LDIuNTMsMi40OCw2LjM0LDYuMzMsMTEuOTJhMjcuOCwyNy44LDAsMCwwLDcuMjQsNy4zNmM4LjA4LDUuNTgsMTcuMTYsNS45MywyNi43OCw2LjMsOC42OS4zMywxOC41NC43MSwyOS43OSw0LjQyLDQuNjYsMS41NCw5LjUsNC41MiwxNS4xMSw4LDEzLjQ3LDguMjgsMzEuOTEsMTkuNjEsNjIuNzcsMTkuNjFzNDkuNDMtMTEuMzksNjMtMTkuN2M1LjU3LTMuNDIsMTAuMzgtNi4zNywxNC45MS03Ljg3LDExLjI1LTMuNzIsMjEuMS00LjA5LDI5Ljc5LTQuNDIsOS42Mi0uMzcsMTguNy0uNzIsMjYuNzgtNi4zYTI3Ljg5LDI3Ljg5LDAsMCwwLDguMjQtOWMyLjc3LTQuNzEsMi43LTgsNS4zLTEwLjNhMTUuMzIsMTUuMzIsMCwwLDEsNC42NC0yLjEyLDEwOC43NiwxMDguNzYsMCwwLDAsMjQuOC05Ljg4QTM5LDM5LDAsMCwwLDQzNy45NCwzNjNsLjEtLjEyQzQ0NS40OCwzNTQuOTIsNDQ3LjM1LDM0NS41NCw0NDQuMywzMzcuMjZaTTQxNi44NywzNTJjLTE2LjczLDkuMjQtMjcuODUsOC4yNS0zNi41LDEzLjgyLTcuMzUsNC43My0zLDE0LjkzLTguMzQsMTguNjEtNi41Niw0LjUzLTI1Ljk1LS4zMi01MSw3Ljk1LTIwLjY2LDYuODMtMzMuODQsMjYuNDctNzEsMjYuNDdTMjAwLDM5OS4yNSwxNzksMzkyLjMzYy0yNS04LjI3LTQ0LjQzLTMuNDItNTEtNy45NS01LjMzLTMuNjgtMS0xMy44OC04LjM0LTE4LjYxQzExMSwzNjAuMiw5OS44OCwzNjEuMTksODMuMTYsMzUyYy0xMC42NS01Ljg4LTQuNjEtOS41Mi0xLjA2LTExLjI0LDYwLjYtMjkuMzQsNzAuMjctNzQuNjQsNzAuNy03OCwuNTItNC4wNywxLjEtNy4yNy0zLjM4LTExLjQxLTQuMzMtNC0yMy41NC0xNS44OS0yOC44Ny0xOS42MS04LjgyLTYuMTYtMTIuNy0xMi4zMS05Ljg0LTE5Ljg3LDItNS4yMyw2Ljg4LTcuMiwxMi03LjJhMjIuMywyMi4zLDAsMCwxLDQuODEuNTRjOS42OCwyLjEsMTkuMDgsNi45NSwyNC41MSw4LjI2YTguNjQsOC42NCwwLDAsMCwyLC4yN2MyLjksMCwzLjkyLTEuNDYsMy43Mi00Ljc4LS42Mi0xMC41OS0yLjEyLTMxLjIzLS40NS01MC41MiwyLjI5LTI2LjU0LDEwLjg0LTM5LjY5LDIxLTUxLjMyLDQuODgtNS41OSwyNy44MS0yOS44Miw3MS42Ni0yOS44MlMzMTYuOCwxMDEuNDMsMzIxLjY4LDEwN2MxMC4xNywxMS42MywxOC43MywyNC43OCwyMSw1MS4zMiwxLjY3LDE5LjI5LjIzLDM5Ljk0LS40NSw1MC41Mi0uMjMsMy40OS44Miw0Ljc4LDMuNzIsNC43OGE4LjU2LDguNTYsMCwwLDAsMi0uMjdjNS40NC0xLjMxLDE0Ljg0LTYuMTYsMjQuNTItOC4yNmEyMi4zLDIyLjMsMCwwLDEsNC44MS0uNTRjNS4xNSwwLDEwLDIsMTIsNy4yLDIuODYsNy41Ni0xLDEzLjcxLTkuODMsMTkuODctNS4zMywzLjcyLTI0LjU0LDE1LjYtMjguODcsMTkuNjEtNC40OSw0LjE0LTMuOSw3LjM0LTMuMzgsMTEuNDEuNDMsMy40MSwxMC4wOSw0OC43MSw3MC43LDc4QzQyMS40OCwzNDIuNDMsNDI3LjUyLDM0Ni4wNyw0MTYuODcsMzUyWiIvPjwvZz48L3N2Zz4="><ul><li><a href="faq.html">Frequently Asked Questions</a></li><li><a href="ranking.html">Statistics &amp; ranking</a></li><li><a href="location_history.html">Location</a></li><li><a href="snap_ads.html">Ads Manager</a></li><li><a href="snap_map_places_history.html">Snap Map places</a></li></ul></div><div class="rightpanel"><h1>Snap Map places</h1><p>This section includes information about the Snap Map places you have added to your Snaps or Story.</p><p class="important"></p><h3>Snap Map places history</h3><table style="table-layout: auto;"><tr><th style="white-space: nowrap; overflow: hidden;"><b>Date</b></th><th style="white-space: nowrap; overflow: hidden;"><b>Place</b></th><th style="white-space: nowrap; overflow: hidden;"><b>Place location</b></th><th style="white-space: nowrap; overflow: hidden;"><b>Share type</b></th></tr><tr><td>2026-06-14 13:23:24 UTC</td><td>Fateh Sagar Lake</td><td>Udaipur, Rajasthan</td><td>Snap Send</td></tr><tr><td>2026-06-10 10:19:37 UTC</td><td>City Palace</td><td>Udaipur, Rajasthan</td><td>Snap Send</td></tr><tr><td>2026-05-31 09:48:35 UTC</td><td>IIM Udaipur</td><td>Sethji Ki Kundal, Rajasthan</td><td>Snap Send</td></tr><tr><td>2026-05-23 13:32:19 UTC</td><td>Mall Road Market Manali</td><td>Manali, Himachal Pradesh</td><td>Snap Send</td></tr><tr><td>2026-05-23 05:21:55 UTC</td><td>Sajla Waterfall Manali</td><td>Manali, HP</td><td>Snap Send</td></tr><tr><td>2026-05-22 07:04:39 UTC</td><td>Gurudwara Sahib Manikaran</td><td>Manikaran, Himachal Pradesh</td><td>Snap Send</td></tr><tr><td>2026-05-21 05:34:09 UTC</td><td>Jogni Waterfall</td><td>Manāli, Himāchal Pradesh</td><td>Snap Send</td></tr><tr><td>2026-05-20 05:37:35 UTC</td><td>Sissu Himachal Pradesh</td><td>Sissu, Himachal Pradesh</td><td>Snap Send</td></tr><tr><td>2026-05-20 05:36:43 UTC</td><td>Atal Tunnel Rohtang</td><td>Manali, HP</td><td>Snap Send</td></tr><tr><td>2026-05-19 13:09:37 UTC</td><td>Manāli</td><td>मनाली, HP</td><td>Snap Send</td></tr><tr><td>2026-05-19 11:18:21 UTC</td><td>Kullu, Himachal Pradesh, India</td><td>Kullu, HP</td><td>Snap Send</td></tr><tr><td>2026-05-18 13:29:04 UTC</td><td>CP67</td><td>Sahibzada Ajit Singh Nagar, Punjab</td><td>Snap Send</td></tr><tr><td>2026-05-18 09:47:12 UTC</td><td>Chandigarh</td><td>चंडीगढ़, CH</td><td>Snap Send</td></tr><tr><td>2026-05-17 07:25:52 UTC</td><td>The Bel St.</td><td>Bengaluru, Karnataka</td><td>Snap Send</td></tr><tr><td>2026-05-16 14:52:29 UTC</td><td>Wangs Kitchen</td><td>Puducherry, PY</td><td>Snap Send</td></tr><tr><td>2026-05-16 08:53:21 UTC</td><td>Kurtosshhh</td><td>Puducherry, Puducherry</td><td>Snap Send</td></tr><tr><td>2026-05-16 03:55:37 UTC</td><td>Puducherry</td><td>पुदुचेरी, PY</td><td>Snap Send</td></tr><tr><td>2026-05-11 10:34:08 UTC</td><td>Windsor Castle</td><td>Windsor, England</td><td>Snap Send</td></tr><tr><td>2026-04-28 15:36:42 UTC</td><td>Greenwich Market</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-25 14:36:05 UTC</td><td>Oxford Outdoor Market</td><td>Oxford, Oxfordshire</td><td>Snap Send</td></tr><tr><td>2026-04-24 20:15:21 UTC</td><td>The Burj (Wanborough)</td><td>Swindon, Wiltshire</td><td>Snap Send</td></tr><tr><td>2026-04-20 14:50:15 UTC</td><td>British Museum</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-20 12:34:20 UTC</td><td>St Paul&#39;s Cathedral</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 19:44:08 UTC</td><td>Chengdu Chengdu</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 19:01:30 UTC</td><td>Covent Garden</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 17:17:17 UTC</td><td>Neal&#39;s Yard</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 16:50:14 UTC</td><td>Outernet</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 12:32:29 UTC</td><td>Italian Bear Chocolate - Soho</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-19 12:15:33 UTC</td><td>The Piccadilly</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-04-16 18:11:58 UTC</td><td>Marlborough</td><td>Marlborough, England</td><td>Snap Send</td></tr><tr><td>2026-04-13 02:04:29 UTC</td><td>Za Za Bazaar</td><td>Bristol, England</td><td>Snap Send</td></tr><tr><td>2026-04-12 17:47:37 UTC</td><td>Bristol</td><td>Clapton in Gordano, England</td><td>Snap Send</td></tr><tr><td>2026-04-11 16:11:33 UTC</td><td>Bath</td><td>Bath, England</td><td>Snap Send</td></tr><tr><td>2026-04-08 17:26:49 UTC</td><td>Bicester Village</td><td>Bicester, England</td><td>Snap Send</td></tr><tr><td>2026-04-05 15:29:25 UTC</td><td>Land&#39;s End</td><td>Penzance, Cornwall</td><td>Snap Send</td></tr><tr><td>2026-04-05 11:24:59 UTC</td><td>St Ives - Cornwall</td><td>Saint Ives, England</td><td>Snap Send</td></tr><tr><td>2026-04-04 18:34:38 UTC</td><td>Newquay</td><td>Newquay, England</td><td>Snap Send</td></tr><tr><td>2026-04-04 13:07:52 UTC</td><td></td><td>, </td><td>Snap Send</td></tr><tr><td>2026-04-02 17:31:02 UTC</td><td>Akbar&#39;s The restaurant</td><td>Manchester, England</td><td>Snap Send</td></tr><tr><td>2026-04-02 13:35:46 UTC</td><td>Blackpool Pleasure Beach Station</td><td>Blackpool, Lancashire</td><td>Snap Send</td></tr><tr><td>2026-04-01 20:53:30 UTC</td><td>Nando&#39;s</td><td>Glasgow, Scotland</td><td>Snap Send</td></tr><tr><td>2026-04-01 18:47:26 UTC</td><td>The Three Sisters In Glencoe, Scotland</td><td>Kinlochleven, Scotland</td><td>Snap Send</td></tr><tr><td>2026-04-01 18:27:12 UTC</td><td>Glenfinnan Viaduct</td><td>Glenfinnan, Lochaber</td><td>Snap Send</td></tr><tr><td>2026-04-01 13:02:35 UTC</td><td>Nevis Range Restaurant</td><td>Spean Bridge, Scotland</td><td>Snap Send</td></tr><tr><td>2026-04-01 13:00:56 UTC</td><td>Ben Nevis Distillery</td><td>Fort William, Lochaber</td><td>Snap Send</td></tr><tr><td>2026-03-31 18:47:27 UTC</td><td>Loch Lomond &amp; The Trossachs National Park</td><td>Alexandria, Scotland</td><td>Snap Send</td></tr><tr><td>2026-03-31 15:36:12 UTC</td><td>The Kelpies</td><td>Falkirk, Falkirk District</td><td>Snap Send</td></tr><tr><td>2026-03-31 14:55:37 UTC</td><td>Linlithgow Palace</td><td>Linlithgow, West Lothian</td><td>Snap Send</td></tr><tr><td>2026-03-30 17:20:44 UTC</td><td>Grassmere, Lake</td><td>Lake District, England</td><td>Snap Send</td></tr><tr><td>2026-03-30 13:04:17 UTC</td><td>The Magic Roundabout</td><td>Windermere, Cumbria</td><td>Snap Send</td></tr><tr><td>2026-03-30 12:02:26 UTC</td><td>Lake Windermere - Lake District</td><td>Windermere, England</td><td>Snap Send</td></tr><tr><td>2026-03-29 15:07:35 UTC</td><td>Stonehenge</td><td>Salisbury, Wiltshire</td><td>Snap Send</td></tr><tr><td>2026-03-27 19:53:07 UTC</td><td>The Arkell&#39;s Strawberry Thief</td><td>Swindon, England</td><td>Snap Send</td></tr><tr><td>2026-03-24 20:39:36 UTC</td><td>Chin Chin Dessert Club (Chin Chin Ice Cream)</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-03-24 18:57:33 UTC</td><td>The Tottenham</td><td>London, Greater London</td><td>Snap Send</td></tr><tr><td>2026-03-24 13:26:06 UTC</td><td>Prime Meridian</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-03-24 12:58:02 UTC</td><td>Royal Observatory Greenwich</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-03-23 17:23:38 UTC</td><td>Leicester</td><td>Leicester, England</td><td>Snap Send</td></tr><tr><td>2026-03-23 13:43:48 UTC</td><td>Loughborough University</td><td>Loughborough, England</td><td>Snap Send</td></tr><tr><td>2026-03-18 18:25:41 UTC</td><td>Canary Wharf</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-03-15 14:42:31 UTC</td><td>Bath</td><td>Bath, England</td><td>Snap Send</td></tr><tr><td>2026-03-14 13:24:56 UTC</td><td>Shri Venkateswara (Balaji) Temple, Tividale</td><td>Oldbury, West Midlands</td><td>Snap Send</td></tr><tr><td>2026-03-11 21:57:27 UTC</td><td>Little Dessert Shop </td><td>Swindon, Swindon</td><td>Snap Send</td></tr><tr><td>2026-03-10 17:51:04 UTC</td><td>Camden Market</td><td>London, Greater London</td><td>Snap Send</td></tr><tr><td>2026-03-09 20:44:21 UTC</td><td>Oxford</td><td>Oxford, England</td><td>Snap Send</td></tr><tr><td>2026-03-09 15:44:16 UTC</td><td>Dovecote</td><td>Kidlington, England</td><td>Snap Send</td></tr><tr><td>2026-03-09 14:56:46 UTC</td><td>The Doors of Durin</td><td>Cheltenham, England</td><td>Snap Send</td></tr><tr><td>2026-03-09 14:47:12 UTC</td><td>The Model Village</td><td>Cheltenham, Cotswolds</td><td>Snap Send</td></tr><tr><td>2026-03-09 14:11:56 UTC</td><td>Bibury</td><td>Bibury, England</td><td>Snap Send</td></tr><tr><td>2026-03-09 12:20:02 UTC</td><td>Cirencester Markets</td><td>Cirencester, Cotswolds</td><td>Snap Send</td></tr><tr><td>2026-03-08 13:08:02 UTC</td><td>The Heights of Abraham</td><td>Matlock, England</td><td>Snap Send</td></tr><tr><td>2026-03-07 13:08:13 UTC</td><td>Mayfield Alpaca Farm &amp; Animal Sanctuary</td><td>Sheffield, Yorkshire</td><td>Snap Send</td></tr><tr><td>2026-03-05 19:22:30 UTC</td><td>Burton on the Wolds</td><td>Burton on the Wolds, England</td><td>Snap Send</td></tr><tr><td>2026-03-03 13:15:38 UTC</td><td>University Of Greenwich</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-03-03 10:59:18 UTC</td><td>London</td><td>London, England</td><td>Snap Send</td></tr><tr><td>2026-02-24 19:12:30 UTC</td><td>Gatwick Airport Railway Station</td><td>West Sussex, England</td><td>Snap Send</td></tr><tr><td>2026-02-17 14:12:42 UTC</td><td>Zoca Diner</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2026-02-14 07:32:37 UTC</td><td>Banana Leaf Restaurant (Kerala Restaurant)</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2026-02-06 15:09:25 UTC</td><td>SUPERDONUTS (VADODARA)</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2026-02-02 14:31:48 UTC</td><td>Urban Chowk</td><td>Ahmedabad, Gujarat</td><td>Snap Send</td></tr><tr><td>2026-01-30 08:24:15 UTC</td><td>Shaka</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2026-01-15 07:01:06 UTC</td><td>Mumbai Zoo (Veermata Jijabai Udyan)</td><td>Mumbai, MH</td><td>Snap Send</td></tr><tr><td>2026-01-14 15:36:44 UTC</td><td>Marine Drive</td><td>Mumbai, Maharashtra</td><td>Snap Send</td></tr><tr><td>2026-01-14 13:32:20 UTC</td><td>The Taj Mahal Palace</td><td>Mumbai, Maharashtra</td><td>Snap Send</td></tr><tr><td>2026-01-14 13:14:31 UTC</td><td>Cafe Mondegar</td><td>Mumbai, Maharashtra</td><td>Snap Send</td></tr><tr><td>2026-01-14 12:13:00 UTC</td><td>Mumbai</td><td>मुंबई, MH</td><td>Snap Send</td></tr><tr><td>2026-01-13 14:55:11 UTC</td><td>Toy Train Track</td><td>Matheran, Maharashtra</td><td>Snap Send</td></tr><tr><td>2026-01-13 14:53:32 UTC</td><td>Mātherān</td><td>माथेरान, MH</td><td>Snap Send</td></tr><tr><td>2026-01-12 10:16:17 UTC</td><td>Chantilly The Cafe</td><td>Mumbai, Maharashtra</td><td>Snap Send</td></tr><tr><td>2026-01-12 08:43:04 UTC</td><td>Yeti</td><td>मुंबई, MH</td><td>Snap Send</td></tr><tr><td>2026-01-12 07:40:24 UTC</td><td>Mumbai Central</td><td>Mumbai, Maharashtra</td><td>Snap Send</td></tr><tr><td>2025-12-17 14:55:24 UTC</td><td>Romaine</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2025-12-07 13:35:21 UTC</td><td>Mangal Bazar</td><td>Vadodara, Gujarat</td><td>Snap Send</td></tr><tr><td>2025-12-05 16:42:50 UTC</td><td></td><td>, </td><td>Snap Send</td></tr><tr><td>2025-12-05 15:40:38 UTC</td><td>Pabbas</td><td>Mangaluru, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-05 11:26:42 UTC</td><td>Pilikula Zoo</td><td>Mangalore, Karnātaka</td><td>Snap Send</td></tr><tr><td>2025-12-05 10:03:08 UTC</td><td>Pilikula Regional Science Centre</td><td>Mangaluru, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-04 14:45:53 UTC</td><td>Maddur Tiffanys</td><td>Mysuru, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-03 02:40:01 UTC</td><td>Thadiyandamol &amp; Chelavara Falls</td><td>Mercara, KA</td><td>Snap Send</td></tr><tr><td>2025-12-02 12:12:36 UTC</td><td>Raja&#39;s Seat</td><td>Madikeri, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-02 10:03:52 UTC</td><td>Paakashala Madikeri</td><td>Madikeri, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-02 05:23:20 UTC</td><td>Dubare elephant camp</td><td>Karadigodu, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-02 05:16:38 UTC</td><td>Dubare</td><td>Virajpet, KA</td><td>Snap Send</td></tr><tr><td>2025-12-01 12:48:58 UTC</td><td>Coorg Jungle Camp Resort</td><td>Kushalnagar, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-01 10:20:57 UTC</td><td>Hotel Tibet</td><td>Bylakuppe, Mysuru</td><td>Snap Send</td></tr><tr><td>2025-12-01 08:43:33 UTC</td><td>Dhondenling Monastry</td><td>Dhondenling, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-01 04:44:13 UTC</td><td>Mysore Palace</td><td>Mysuru, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-01 02:52:54 UTC</td><td>Vinayaka Mylari</td><td>Mysore, Karnataka</td><td>Snap Send</td></tr><tr><td>2025-12-01 01:31:23 UTC</td><td>Mysore Junction Railway Station</td><td>Mysore, Karnātaka</td><td>Snap Send</td></tr><tr><td>2025-11-27 09:09:42 UTC</td><td>Canteen 18</td><td>Puducherry, Puducherry</td><td>Snap Send</td></tr><tr><td>2025-11-27 03:09:49 UTC</td><td>Uncle Peter&#39;s Pancakes</td><td>Puducherry, Puducherry</td><td>Snap Send</td></tr><tr><td>2025-11-26 13:52:19 UTC</td><td>De Roman Restaurant</td><td>Puducherry, पुदुच्चेरी</td><td>Snap Send</td></tr><tr><td>2025-11-08 19:07:19 UTC</td><td>Kora Karnival</td><td>Chennai, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-11-08 16:05:01 UTC</td><td>Shadows Pub</td><td>Chennai, TN</td><td>Snap Send</td></tr><tr><td>2025-10-27 08:01:36 UTC</td><td>Pizza Bell</td><td>Vadodara, GUJARAT</td><td>Snap Send</td></tr><tr><td>2025-10-16 09:35:44 UTC</td><td>Chilli’s</td><td>Chennai, Tamil Nādu</td><td>Snap Send</td></tr><tr><td>2025-10-12 08:33:22 UTC</td><td>Pind</td><td>Chennai, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-10-03 14:53:19 UTC</td><td>Double Roti</td><td>Chennai, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-09-26 09:11:48 UTC</td><td>Tummy Tales</td><td>Navalur, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-08-10 15:19:48 UTC</td><td>Lepcha Restaurant</td><td>Chennai, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-08-10 09:48:09 UTC</td><td>Dumont Creamery</td><td>Chennai, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-08-08 16:40:08 UTC</td><td>Polar Bear</td><td>Hyderabad, TG</td><td>Snap Send</td></tr><tr><td>2025-08-08 15:24:30 UTC</td><td>OSAKA - Truly Asian</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-08-06 09:54:05 UTC</td><td>Masterpiece Buffet</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-08-03 02:33:57 UTC</td><td>Taj Mahal Hotel Jubilee Hills</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-08-02 04:35:09 UTC</td><td></td><td>, </td><td>Snap Send</td></tr><tr><td>2025-08-01 08:57:34 UTC</td><td>Barbeque Holic</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-07-30 14:20:40 UTC</td><td>The Chocolate Room Cafe Lounge</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-07-20 10:03:51 UTC</td><td>Dumont Creamery</td><td>Padur, Tamil Nadu</td><td>Snap Send</td></tr><tr><td>2025-07-12 15:55:24 UTC</td><td>Frozen Bottle</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr><tr><td>2025-07-12 15:21:01 UTC</td><td>DLF Cyber City</td><td>Hyderabad, Telangana</td><td>Snap Send</td></tr></table></div></body>
+    <script>
+
+        const navigationItems = document.querySelectorAll('.leftpanel li');
+        navigationItems.forEach(item => {
+            const link = item.querySelector('a');
+            const linkHref = link.getAttribute('href');
+            const currentUrl = window.location.pathname;
+
+            if (currentUrl.endsWith(linkHref)) {
+                item.classList.add('active'); // Add 'active' class to the <li> element
+            }
+
+            item.addEventListener('click', function(event) {
+                event.preventDefault();
+                if(currentUrl.includes("subpage")){
+                    const newHref = "../"+linkHref;
+                     // Navigate to the new HTML page from one of the chat/snap subpages
+                    window.location.href = newHref;
+                }else{
+                    // Navigate to the new HTML page
+                    window.location.href = linkHref;
+                }
+            });
+        });
+
+
+
+        // Scroll to the active navigation item on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeLink = document.querySelector('.leftpanel li.active');
+            if (activeLink) {
+                const linkRect = activeLink.getBoundingClientRect();
+                if (linkRect.top < 0 || linkRect.bottom > window.innerHeight) {
+                    activeLink.scrollIntoView({ behavior: 'auto' });
+                }
+            }
+        });
+    </script></html>
