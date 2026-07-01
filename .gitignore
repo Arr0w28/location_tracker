@@ -1,0 +1,67 @@
+# ============================================================
+# 3D Travel Diary — .gitignore
+# ============================================================
+
+# ---- Environment & Secrets ---------------------------------
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.pem
+*.key
+*.cert
+
+# ---- Dependencies ------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ---- Next.js Build Output ----------------------------------
+.next/
+out/
+build/
+dist/
+
+# ---- TypeScript --------------------------------------------
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- OS & Editor Artifacts ---------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---- Logs --------------------------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# ---- Testing & Coverage ------------------------------------
+/coverage
+.nyc_output
+
+# ---- Deployment --------------------------------------------
+.vercel
+.netlify
+
+# ---- Personal/Private Data ---------------------------------
+# Raw Snapchat exports — never commit personal location history
+*.html
+snap_map_places_history*
+memories_history*
+
+# ---- Misc --------------------------------------------------
+*.pem
+.cache/
