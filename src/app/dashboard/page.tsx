@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import { parseSnapchatHtml } from '@/lib/parsers/snapchat-html-parser'
 import { geocodeLocations } from '@/lib/geocoding/nominatim-geocoder'
+import Link from 'next/link'
 
 export default function DashboardPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -20,7 +21,7 @@ export default function DashboardPage() {
   const supabase = createClient()
 
   const logMessage = (msg: string) => {
-    setLogs(prev => [msg, ...prev].slice(0, 100)) // Keep last 100 logs
+    setLogs(prev => [msg, ...prev].slice(0, 100))
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,10 +53,10 @@ export default function DashboardPage() {
       logMessage('Starting parsing of Snapchat HTML file...')
       const htmlText = await file.text()
       const parsedData = parseSnapchatHtml(htmlText)
-      
+
       setStats(prev => ({ ...prev, parsed: parsedData.length }))
       logMessage(`Successfully parsed ${parsedData.length} location records.`)
-      
+
       if (parsedData.length === 0) {
         throw new Error('No valid location records found in the file.')
       }
@@ -63,7 +64,7 @@ export default function DashboardPage() {
       // 2. Geocoding
       setStatus('geocoding')
       logMessage('Starting geocoding process (respecting OSM rate limit, caching duplicates)...')
-      
+
       const geocodedData = await geocodeLocations(parsedData, (current, total, place) => {
         setProgress({ current, total, place })
         logMessage(`[${current}/${total}] Resolving: ${place}`)
@@ -79,7 +80,7 @@ export default function DashboardPage() {
       // 3. Saving to Database
       setStatus('saving')
       logMessage('Sending records to backend database...')
-      
+
       const response = await fetch('/api/locations', {
         method: 'POST',
         headers: {
@@ -108,20 +109,32 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden font-sans">
-      {/* Premium Gradient Backgrounds */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-neutral-900 to-black opacity-90 z-0" />
-      <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[140px] animate-pulse" />
-      <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[140px] animate-pulse delay-1000" />
+    <div className="relative min-h-screen bg-[#FAF8F5] text-[#2D2C2A] flex flex-col justify-between overflow-hidden font-sans select-none">
+      {/* Background Soft Blobs */}
+      <div className="absolute top-[20%] left-[-10%] -z-10 w-[50vw] h-[50vw] rounded-full bg-[#C87A53]/3 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-10%] -z-10 w-[45vw] h-[45vw] rounded-full bg-[#7A8271]/3 blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-10 w-full px-6 py-4 flex justify-between items-center border-b border-white/5 bg-black/30 backdrop-blur-md">
-        <h1 className="text-xl font-bold tracking-wider bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-          3D Travel Diary
-        </h1>
-        <Button onClick={handleSignOut} variant="ghost" className="text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5">
-          Sign Out
-        </Button>
+      <header className="relative z-10 w-full max-w-6xl mx-auto px-6 py-4 flex justify-between items-center border-b border-[#ECE7E0]/60 bg-white/20 backdrop-blur-md">
+        <Link href="/" className="font-serif text-2xl tracking-wide text-[#2D2C2A] font-semibold">
+          集む — Atsumu
+        </Link>
+        <div className="flex items-center space-x-4">
+          <Button
+            onClick={() => router.push('/map')}
+            variant="outline"
+            className="border-[#ECE7E0] hover:bg-[#F3EFE9] text-[#2D2C2A] text-xs font-semibold rounded-full px-5"
+          >
+            🗺️ View Map
+          </Button>
+          <Button
+            onClick={handleSignOut}
+            variant="ghost"
+            className="text-[#76736F] hover:text-[#2D2C2A] hover:bg-[#F3EFE9] text-xs font-semibold rounded-full"
+          >
+            Sign Out
+          </Button>
+        </div>
       </header>
 
       {/* Main Content Dashboard */}
@@ -129,88 +142,89 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 28, stiffness: 90 }}
           className="w-full max-w-3xl"
         >
-          <Card className="border-white/10 bg-neutral-900/40 backdrop-blur-lg shadow-2xl text-white">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold">Import Location History</CardTitle>
-              <CardDescription className="text-neutral-400">
-                Upload your Snapchat Map places history HTML file to map your journey.
+          <Card className="border-[#ECE7E0] bg-white shadow-xl shadow-[#ECE7E0]/45 rounded-2xl p-2">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="font-serif text-3xl font-medium text-[#2D2C2A]">Import History</CardTitle>
+              <CardDescription className="text-xs font-light text-[#76736F] uppercase tracking-widest mt-1">
+                Upload your HTML file to map your reflection.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {status === 'idle' && (
-                <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-10 hover:border-purple-500/50 transition-all duration-300 bg-white/5 relative">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#ECE7E0] rounded-xl p-12 hover:border-[#C87A53]/50 transition-all duration-300 bg-[#FAF8F5] relative">
                   <input
                     type="file"
                     accept=".html"
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <div className="text-center space-y-2 pointer-events-none">
-                    <div className="text-4xl">📂</div>
-                    <p className="text-sm font-semibold">
-                      {file ? file.name : 'Click or drag snap_map_places_history.html here'}
+                  <div className="text-center space-y-3 pointer-events-none">
+                    <div className="text-4xl text-[#7A8271]">📂</div>
+                    <p className="text-sm font-semibold text-[#2D2C2A]">
+                      {file ? file.name : 'Click or drag your snapchat html file here'}
                     </p>
-                    <p className="text-xs text-neutral-500">Only Snapchat HTML export files are accepted</p>
+                    <p className="text-[11px] text-[#76736F]">Only Snapchat HTML exports are supported</p>
                   </div>
                 </div>
               )}
 
               {/* Progress Tracker UI */}
               {status !== 'idle' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-sm font-medium">
-                    <span className="capitalize">{status}...</span>
+                <div className="space-y-5">
+                  <div className="flex justify-between items-center text-xs uppercase tracking-wider font-semibold text-[#76736F]">
+                    <span>Status: {status}</span>
                     {status === 'geocoding' && progress.total > 0 && (
-                      <span className="text-purple-400">
+                      <span className="text-[#C87A53] font-mono">
                         {progress.current} / {progress.total}
                       </span>
                     )}
                   </div>
-                  
+
                   {/* Progress Bar */}
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[#FAF8F5] rounded-full overflow-hidden border border-[#ECE7E0]">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                      className="h-full bg-[#C87A53]"
                       initial={{ width: 0 }}
                       animate={{
-                        width: 
+                        width:
                           status === 'parsing' ? '20%' :
-                          status === 'geocoding' ? `${20 + (progress.current / progress.total) * 60}%` :
-                          status === 'saving' ? '90%' :
-                          status === 'done' ? '100%' : '0%'
+                            status === 'geocoding' ? `${20 + (progress.current / progress.total) * 60}%` :
+                              status === 'saving' ? '90%' :
+                                status === 'done' ? '100%' : '0%'
                       }}
                       transition={{ duration: 0.3 }}
                     />
                   </div>
 
                   {status === 'geocoding' && progress.place && (
-                    <p className="text-xs text-neutral-400 italic text-center truncate">
-                      Resolving coordinate: {progress.place}
+                    <p className="text-xs text-[#7A8271] italic text-center truncate px-4">
+                      Resolving: {progress.place}
                     </p>
                   )}
 
                   {/* Summary/Stats Box */}
-                  <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-white/5 text-center text-sm">
+                  <div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-[#FAF8F5] border border-[#ECE7E0]/60 text-center">
                     <div>
-                      <div className="text-xs text-neutral-400">Parsed Records</div>
-                      <div className="text-lg font-bold text-indigo-400">{stats.parsed}</div>
+                      <div className="text-[10px] text-[#76736F] uppercase tracking-wider font-semibold">Parsed</div>
+                      <div className="text-lg font-serif font-medium text-[#2D2C2A]">{stats.parsed}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-neutral-400">Geocoded Coordinates</div>
-                      <div className="text-lg font-bold text-purple-400">{stats.geocoded}</div>
+                      <div className="text-[10px] text-[#76736F] uppercase tracking-wider font-semibold">Geocoded</div>
+                      <div className="text-lg font-serif font-medium text-[#7A8271]">{stats.geocoded}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-neutral-400">Saved to DB</div>
-                      <div className="text-lg font-bold text-green-400">{stats.saved}</div>
+                      <div className="text-[10px] text-[#76736F] uppercase tracking-wider font-semibold">Saved</div>
+                      <div className="text-lg font-serif font-medium text-[#C87A53]">{stats.saved}</div>
                     </div>
                   </div>
 
                   {/* Logs Section */}
                   <div className="space-y-2">
-                    <div className="text-xs text-neutral-400 uppercase tracking-wider font-bold">Activity Log</div>
-                    <div className="h-40 overflow-y-auto p-3 rounded bg-black/60 font-mono text-xs text-neutral-300 space-y-1 flex flex-col-reverse">
+                    <div className="text-[10px] text-[#76736F] uppercase tracking-wider font-bold">Activity Log</div>
+                    <div className="h-32 overflow-y-auto p-3 rounded-xl border border-[#ECE7E0] bg-[#FAF8F5] font-mono text-[10px] text-[#76736F] space-y-1 flex flex-col-reverse">
                       {logs.map((log, index) => (
                         <div key={index} className="truncate">
                           {log}
@@ -221,21 +235,21 @@ export default function DashboardPage() {
                 </div>
               )}
             </CardContent>
-            
-            <CardFooter className="flex justify-between">
+
+            <CardFooter className="pt-4 pb-2">
               {status === 'idle' && (
                 <Button
                   onClick={handleUploadAndProcess}
                   disabled={!file}
-                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white"
+                  className="w-full bg-[#2D2C2A] hover:bg-[#C87A53] text-[#FAF8F5] py-6 rounded-full font-semibold tracking-wide transition-all duration-500 ease-out shadow-md"
                 >
-                  Parse & Geocode Location Data
+                  Import and Reflect on Journey
                 </Button>
               )}
               {status === 'done' && (
                 <Button
                   onClick={() => router.push('/map')}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white animate-bounce"
+                  className="w-full bg-[#7A8271] hover:bg-[#6A7161] text-[#FAF8F5] py-6 rounded-full font-semibold tracking-wide transition-all duration-500 ease-out shadow-md"
                 >
                   Open 3D Travel Globe Map 🌍
                 </Button>
@@ -246,8 +260,8 @@ export default function DashboardPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 w-full text-center py-4 text-xs text-neutral-500 border-t border-white/5 bg-black/20">
-        3D Travel Diary &copy; 2026. Made with OpenStreetMap Nominatim and Next.js.
+      <footer className="w-full py-6 text-center text-[10px] text-[#76736F] font-light border-t border-[#ECE7E0]/60 bg-white/20">
+        © 2026 Atsumu. Built with OpenStreetMap & Next.js.
       </footer>
     </div>
   )

@@ -15,9 +15,9 @@ import { AnimatePresence } from 'framer-motion'
 const GlobeView = dynamic(() => import('@/components/globe/GlobeView'), {
   ssr: false,
   loading: () => (
-    <div className="h-screen w-screen flex flex-col items-center justify-center bg-black text-white font-mono">
-      <div className="w-12 h-12 border-t-2 border-indigo-500 border-solid rounded-full animate-spin mb-4" />
-      <p className="text-xs tracking-widest uppercase text-neutral-400">Initializing 3D Travel Globe...</p>
+    <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#FAF8F5] text-[#2D2C2A] select-none">
+      <div className="w-12 h-12 border-2 border-[#C87A53] border-t-transparent rounded-full animate-spin mb-4" />
+      <p className="text-xs tracking-widest uppercase text-[#76736F] font-semibold">Initializing 3D Travel Globe...</p>
     </div>
   ),
 })
@@ -70,11 +70,29 @@ export default function MapPage() {
   const visibleCount = Math.max(1, Math.round((timeProgress / 100) * sorted.length))
   const currentLocation = sorted[visibleCount - 1] || null
 
+  // Timeline preview card state to show Polaroid for a second on location activation
+  const [timelineActiveLocation, setTimelineActiveLocation] = useState<LocationRecord | null>(null)
+
+  useEffect(() => {
+    if (!currentLocation) {
+      setTimelineActiveLocation(null)
+      return
+    }
+
+    setTimelineActiveLocation(currentLocation)
+
+    const timer = setTimeout(() => {
+      setTimelineActiveLocation(null)
+    }, 1500) // Show for 1.5 seconds
+
+    return () => clearTimeout(timer)
+  }, [currentLocation])
+
   if (isLoading) {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-black text-white font-mono">
-        <div className="w-12 h-12 border-t-2 border-indigo-500 border-solid rounded-full animate-spin mb-4" />
-        <p className="text-xs tracking-widest uppercase text-neutral-400">Loading your memories...</p>
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#FAF8F5] text-[#2D2C2A] select-none">
+        <div className="w-12 h-12 border-2 border-[#C87A53] border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs tracking-widest uppercase text-[#76736F] font-semibold">Loading your memories...</p>
       </div>
     )
   }
@@ -82,14 +100,15 @@ export default function MapPage() {
   return (
     <div
       onMouseMove={handleMouseMove}
-      className="relative w-screen h-screen overflow-hidden bg-[#030014] select-none"
+      onMouseLeave={() => setHoveredLocation(null)}
+      className="relative w-screen h-screen overflow-hidden bg-[#030202] select-none"
     >
       {/* 1. Header controls overlay */}
       <div className="absolute top-6 left-6 z-20 flex items-center gap-4">
         <Button
           onClick={() => router.push('/dashboard')}
           variant="outline"
-          className="bg-black/40 border-white/10 hover:bg-white/10 text-white font-semibold"
+          className="bg-white/80 border-[#ECE7E0] hover:bg-[#FAF8F5] text-[#2D2C2A] font-semibold rounded-full shadow-sm backdrop-blur-md h-10 px-5 transition-all duration-300"
         >
           📂 Upload Data
         </Button>
@@ -99,7 +118,7 @@ export default function MapPage() {
         <Button
           onClick={handleSignOut}
           variant="outline"
-          className="bg-black/40 border-white/10 hover:bg-white/10 text-white font-semibold"
+          className="bg-white/80 border-[#ECE7E0] hover:bg-[#FAF8F5] text-[#2D2C2A] font-semibold rounded-full shadow-sm backdrop-blur-md h-10 px-5 transition-all duration-300"
         >
           Logout
         </Button>
@@ -116,14 +135,20 @@ export default function MapPage() {
           timeProgress={timeProgress}
         />
       ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 text-white bg-black/80">
-          <p className="text-lg font-semibold text-neutral-300 mb-4">No location history found.</p>
-          <Button
-            onClick={() => router.push('/dashboard')}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 py-6"
-          >
-            Import Snapchat Data to Start 🚀
-          </Button>
+        <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 text-[#2D2C2A] bg-[#FAF8F5]">
+          <div className="max-w-md space-y-6">
+            <div className="text-5xl">🧭</div>
+            <h2 className="font-serif text-3xl font-medium tracking-tight">No location history found</h2>
+            <p className="text-sm font-light text-[#76736F] leading-relaxed">
+              Import your travel history to generate a beautiful, private 3D reflection journal.
+            </p>
+            <Button
+              onClick={() => router.push('/dashboard')}
+              className="bg-[#2D2C2A] hover:bg-[#C87A53] text-[#FAF8F5] py-6 px-8 rounded-full font-semibold tracking-wide transition-all duration-500 ease-out shadow-md"
+            >
+              Import Snapchat Data to Start 🚀
+            </Button>
+          </div>
         </div>
       )}
 
@@ -145,15 +170,21 @@ export default function MapPage() {
         onUpdate={handleLocationUpdate}
       />
 
-      {/* 5. Polaroid hover state */}
+      {/* 5. Polaroid hover or timeline active state */}
       <AnimatePresence>
-        {hoveredLocation && (
+        {hoveredLocation ? (
           <PolaroidCard
+            key={`hover-${hoveredLocation.id}`}
             location={hoveredLocation}
             x={mouseCoords.x}
             y={mouseCoords.y}
           />
-        )}
+        ) : timelineActiveLocation ? (
+          <PolaroidCard
+            key="timeline-polaroid-preview"
+            location={timelineActiveLocation}
+          />
+        ) : null}
       </AnimatePresence>
     </div>
   )

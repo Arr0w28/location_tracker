@@ -9,104 +9,122 @@ export interface GeocodeResult {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Geocodes an array of parsed Snapchat places using the OpenStreetMap Nominatim API.
- * Follows the 1 request per second policy and caches duplicate queries.
+ * Geocodes an array of parsed Snapchat places.
+ * To make this extremely fast and stable:
+ * 1. Deduplicates queries so we never query the API twice for the same spot.
+ * 2. Uses Komoot Photon API (high-speed OSM Elasticsearch mirror) as the primary geocoder.
+ * 3. Falls back to OpenStreetMap Nominatim with rate limiting only if Photon misses.
  */
 export async function geocodeLocations(
   locations: { timestamp: string; placeName: string; placeLocation: string }[],
   onProgress: (currentIndex: number, total: number, currentPlace: string) => void
 ): Promise<GeocodeResult[]> {
-  const results: GeocodeResult[] = [];
   const cache = new Map<string, { lat: number; lng: number }>();
-
-  for (let i = 0; i < locations.length; i++) {
-    const loc = locations[i];
-    
-    // Clean up query terms
+  
+  // 1. Resolve and normalize queries
+  const normalizedLocations = locations.map(loc => {
     const queryParts = [loc.placeName, loc.placeLocation]
       .map(part => part.trim())
       .filter(part => part && part !== ',');
-      
-    const query = queryParts.join(', ');
-    
-    onProgress(i + 1, locations.length, query || loc.placeLocation);
+    const query = queryParts.join(', ').trim();
+    return { ...loc, query };
+  });
 
-    if (!query) {
-      continue;
-    }
+  // 2. Identify unique queries (ignore empty ones)
+  const uniqueQueries = Array.from(
+    new Set(normalizedLocations.map(loc => loc.query).filter(q => q.length > 0))
+  );
 
-    // Check cache
-    if (cache.has(query)) {
-      const coords = cache.get(query)!;
-      results.push({
-        ...loc,
-        latitude: coords.lat,
-        longitude: coords.lng,
-      });
-      continue;
-    }
+  console.log(`Deduplicated: ${locations.length} records reduced to ${uniqueQueries.length} unique locations.`);
+
+  // 3. Geocode unique queries
+  for (let i = 0; i < uniqueQueries.length; i++) {
+    const query = uniqueQueries[i];
+    onProgress(i + 1, uniqueQueries.length, query);
 
     try {
-      // Nominatim requires max 1 request/sec. Sleep 1000ms if not cached.
-      if (i > 0) {
-        await delay(1005); // slightly over 1 second to be safe
+      // 3.1. Primary: Komoot Photon (Fast, no strict rate limit, OSM-based)
+      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`;
+      
+      // Small delay to be extremely polite (approx 15 requests per second)
+      await delay(65);
+
+      const response = await fetch(photonUrl, {
+        headers: {
+          'User-Agent': '3D-Travel-Diary-App/1.0',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.features && data.features.length > 0) {
+          const [lng, lat] = data.features[0].geometry.coordinates;
+          cache.set(query, { lat, lng });
+          continue;
+        }
       }
 
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
-      
-      const response = await fetch(url, {
+      // 3.2. Fallback: OSM Nominatim (with strict 1 request per second sleep)
+      console.log(`Photon miss for: "${query}". Falling back to OSM Nominatim...`);
+      await delay(1005); // Sleep to honor Nominatim usage policy
+
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+      const nomResponse = await fetch(nominatimUrl, {
         headers: {
           'User-Agent': '3D-Travel-Diary-App/1.0 (contact: travel-diary@example.com)',
         },
       });
 
-      if (!response.ok) {
-        console.error(`Nominatim API returned error status: ${response.status}`);
-        continue;
+      if (nomResponse.ok) {
+        const nomData = await nomResponse.json();
+        if (nomData && nomData.length > 0) {
+          const lat = parseFloat(nomData[0].lat);
+          const lng = parseFloat(nomData[0].lon);
+          cache.set(query, { lat, lng });
+          continue;
+        }
       }
 
-      const data = await response.json();
-      if (data && data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        
-        cache.set(query, { lat, lng });
-        results.push({
-          ...loc,
-          latitude: lat,
-          longitude: lng,
+      // 3.3. Last Ditch: Query just the placeLocation (e.g. city/country name only)
+      const loc = normalizedLocations.find(l => l.query === query);
+      if (loc && loc.placeLocation && loc.placeLocation.trim() !== '' && loc.placeLocation !== ', ') {
+        console.log(`Full query miss. Trying location fallback: "${loc.placeLocation}"`);
+        await delay(1005);
+
+        const fallbackUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc.placeLocation)}&format=json&limit=1`;
+        const fbResponse = await fetch(fallbackUrl, {
+          headers: {
+            'User-Agent': '3D-Travel-Diary-App/1.0 (contact: travel-diary@example.com)',
+          },
         });
-      } else {
-        // Fallback: Query just the placeLocation (e.g. "Udaipur, Rajasthan") instead of the full place name
-        if (loc.placeName && loc.placeLocation && loc.placeLocation !== ', ') {
-          await delay(1005);
-          const fallbackUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(loc.placeLocation)}&format=json&limit=1`;
-          const fallbackResponse = await fetch(fallbackUrl, {
-            headers: {
-              'User-Agent': '3D-Travel-Diary-App/1.0 (contact: travel-diary@example.com)',
-            },
-          });
-          
-          if (fallbackResponse.ok) {
-            const fallbackData = await fallbackResponse.json();
-            if (fallbackData && fallbackData.length > 0) {
-              const lat = parseFloat(fallbackData[0].lat);
-              const lng = parseFloat(fallbackData[0].lon);
-              
-              cache.set(query, { lat, lng });
-              results.push({
-                ...loc,
-                latitude: lat,
-                longitude: lng,
-              });
-              continue;
-            }
+
+        if (fbResponse.ok) {
+          const fbData = await fbResponse.json();
+          if (fbData && fbData.length > 0) {
+            const lat = parseFloat(fbData[0].lat);
+            const lng = parseFloat(fbData[0].lon);
+            cache.set(query, { lat, lng });
           }
         }
-        console.warn(`Could not geocode location: ${query}`);
       }
-    } catch (error) {
-      console.error(`Error geocoding ${query}:`, error);
+
+    } catch (err) {
+      console.error(`Error geocoding unique query "${query}":`, err);
+    }
+  }
+
+  // 4. Map coordinates back to the full list of parsed entries
+  const results: GeocodeResult[] = [];
+  for (const loc of normalizedLocations) {
+    if (loc.query && cache.has(loc.query)) {
+      const coords = cache.get(loc.query)!;
+      results.push({
+        timestamp: loc.timestamp,
+        placeName: loc.placeName,
+        placeLocation: loc.placeLocation,
+        latitude: coords.lat,
+        longitude: coords.lng,
+      });
     }
   }
 

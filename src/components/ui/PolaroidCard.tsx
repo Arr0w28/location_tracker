@@ -5,8 +5,8 @@ import { LocationRecord } from '@/hooks/useLocations'
 
 interface PolaroidCardProps {
   location: LocationRecord
-  x: number
-  y: number
+  x?: number
+  y?: number
 }
 
 export default function PolaroidCard({ location, x, y }: PolaroidCardProps) {
@@ -20,6 +20,7 @@ export default function PolaroidCard({ location, x, y }: PolaroidCardProps) {
   // Get image URL or fallback placeholder
   const hasImage = location.image_urls && location.image_urls.length > 0
   const imageUrl = hasImage ? location.image_urls![0] : null
+  const isFloating = x !== undefined && y !== undefined
 
   return (
     <motion.div
@@ -27,13 +28,22 @@ export default function PolaroidCard({ location, x, y }: PolaroidCardProps) {
       animate={{ opacity: 1, scale: 1, rotate: 2 }}
       exit={{ opacity: 0, scale: 0.9, rotate: -2 }}
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-      style={{
-        position: 'fixed',
-        left: x + 15, // Offset slightly to the right of cursor
-        top: y - 290, // Position above the cursor
-        pointerEvents: 'none',
-      }}
-      className="z-50 w-60 bg-white p-3.5 pb-7 rounded shadow-2xl border border-neutral-200 flex flex-col items-center"
+      style={
+        isFloating
+          ? {
+              position: 'fixed',
+              left: x + 15, // Offset slightly to the right of cursor
+              top: y - 290, // Position above the cursor
+              pointerEvents: 'none',
+            }
+          : {
+              position: 'fixed',
+              right: '24px',
+              top: '96px',
+              pointerEvents: 'none',
+            }
+      }
+      className="z-50 w-60 bg-white p-3.5 pb-7 rounded-xl shadow-2xl border border-[#ECE7E0] flex flex-col items-center select-none"
     >
       {/* Photo Frame */}
       <div className="w-full aspect-square bg-neutral-100 border border-neutral-200 overflow-hidden relative flex items-center justify-center">

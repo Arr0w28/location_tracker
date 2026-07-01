@@ -181,29 +181,29 @@ export default function DetailsPanel({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full sm:max-w-md bg-neutral-950/95 border-l border-white/10 text-white overflow-y-auto backdrop-blur-xl">
-        <SheetHeader className="space-y-1 mb-6 text-left">
+      <SheetContent className="w-full sm:max-w-md bg-white/95 border-l border-[#ECE7E0] text-[#2D2C2A] overflow-y-auto backdrop-blur-xl select-none p-6">
+        <SheetHeader className="space-y-2 mb-6 text-left">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-400">
-              EXPLORED LOCATION
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#C87A53]">
+              Explored Location
             </span>
             {isSaving && (
-              <span className="text-xs text-neutral-400 animate-pulse">Saving changes...</span>
+              <span className="text-[10px] text-[#7A8271] font-mono animate-pulse">Auto-saving...</span>
             )}
           </div>
-          <SheetTitle className="text-2xl font-bold tracking-tight text-white">
+          <SheetTitle className="font-serif text-3xl font-medium tracking-tight text-[#2D2C2A]">
             {location.place_name}
           </SheetTitle>
-          <SheetDescription className="text-neutral-400 text-xs">
-            {location.place_location || 'No region coordinates stored'}
+          <SheetDescription className="text-[#76736F] text-xs font-light">
+            {location.place_location || 'Coordinates Explored'}
           </SheetDescription>
-          <p className="text-[10px] text-neutral-500 font-mono mt-1">{formattedDate}</p>
+          <p className="text-[9px] text-[#9E9A95] font-mono mt-1">{formattedDate}</p>
         </SheetHeader>
 
         <div className="space-y-6">
           {/* Custom Journal Entry Title */}
           <div className="space-y-2">
-            <Label htmlFor="custom-title" className="text-xs font-semibold text-neutral-300">
+            <Label htmlFor="custom-title" className="text-xs font-semibold text-[#76736F] uppercase tracking-wider">
               Journal Title
             </Label>
             <Input
@@ -211,13 +211,13 @@ export default function DetailsPanel({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Give this place a custom memory title..."
-              className="bg-white/5 border-white/10 focus:border-purple-500 text-white"
+              className="bg-[#FAF8F5] border-[#ECE7E0] focus:border-[#C87A53] text-[#2D2C2A] placeholder:text-[#9E9A95] rounded-xl h-11 transition-all duration-300"
             />
           </div>
 
           {/* Travel Diary Notes */}
           <div className="space-y-2">
-            <Label htmlFor="blog-content" className="text-xs font-semibold text-neutral-300">
+            <Label htmlFor="blog-content" className="text-xs font-semibold text-[#76736F] uppercase tracking-wider">
               Memories & Diary Entry
             </Label>
             <Textarea
@@ -226,20 +226,20 @@ export default function DetailsPanel({
               value={blogContent}
               onChange={(e) => setBlogContent(e.target.value)}
               placeholder="Write down what you did here, who you were with, and how you felt..."
-              className="bg-white/5 border-white/10 focus:border-purple-500 text-white resize-none"
+              className="bg-[#FAF8F5] border-[#ECE7E0] focus:border-[#C87A53] text-[#2D2C2A] placeholder:text-[#9E9A95] rounded-xl resize-none transition-all duration-300"
             />
           </div>
 
           {/* Photo Gallery & Uploads */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <Label className="text-xs font-semibold text-neutral-300">
+              <Label className="text-xs font-semibold text-[#76736F] uppercase tracking-wider">
                 Diary Photos
               </Label>
               <Button
                 variant="outline"
                 size="sm"
-                className="relative bg-white/5 border-white/10 hover:bg-white/10 hover:text-white"
+                className="relative border-[#ECE7E0] hover:bg-[#F3EFE9] text-[#2D2C2A] rounded-full text-xs font-medium"
                 disabled={isUploading}
               >
                 {isUploading ? 'Uploading...' : 'Add Photo'}
@@ -259,7 +259,7 @@ export default function DetailsPanel({
                 {location.image_urls.map((url, index) => (
                   <div
                     key={index}
-                    className="relative aspect-square rounded overflow-hidden border border-white/10 bg-neutral-900 group"
+                    className="relative aspect-square rounded-xl overflow-hidden border border-[#ECE7E0] bg-[#FAF8F5] group"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -267,12 +267,12 @@ export default function DetailsPanel({
                       alt={`Upload ${index + 1}`}
                       className="object-cover w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleImageDelete(url)}
-                        className="py-1 px-2.5 h-auto text-xs"
+                        className="py-1 px-3 h-auto text-xs bg-[#A34E36] hover:bg-[#8F3F28] rounded-full"
                       >
                         Delete
                       </Button>
@@ -281,7 +281,7 @@ export default function DetailsPanel({
                 ))}
               </div>
             ) : (
-              <div className="border border-dashed border-white/10 rounded-lg p-6 text-center text-xs text-neutral-500">
+              <div className="border border-dashed border-[#ECE7E0] rounded-xl p-8 text-center text-xs text-[#76736F] bg-[#FAF8F5] leading-relaxed">
                 💡 Capture the memory! Upload photos from this spot to see them inside the Polaroid hover cards.
               </div>
             )}

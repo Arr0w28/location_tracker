@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -41,32 +42,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black text-white">
-      {/* Dynamic/Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-purple-950 via-neutral-950 to-indigo-950 opacity-80" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] animate-pulse delay-700" />
+    <div className="relative min-h-screen flex flex-col items-center justify-between bg-[#FAF8F5] text-[#2D2C2A] p-6 select-none overflow-hidden">
+      {/* Background Soft Blobs */}
+      <div className="absolute top-[20%] left-[-10%] -z-10 w-[50vw] h-[50vw] rounded-full bg-[#C87A53]/3 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-10%] -z-10 w-[45vw] h-[45vw] rounded-full bg-[#7A8271]/3 blur-[120px] pointer-events-none" />
 
-      {/* Main glassmorphic login card */}
+      {/* Header / Logo */}
+      <header className="w-full max-w-6xl mx-auto py-4 flex justify-between items-center z-10">
+        <Link href="/" className="font-serif text-2xl tracking-wide text-[#2D2C2A] font-semibold">
+          集む — Atsumu
+        </Link>
+        <Link href="/" className="text-xs font-semibold uppercase tracking-wider text-[#7A8271] hover:text-[#C87A53] transition-colors duration-300">
+          ← Back to sanctuary
+        </Link>
+      </header>
+
+      {/* Main Login Card Container */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-md p-4"
+        transition={{ type: 'spring', damping: 28, stiffness: 90 }}
+        className="w-full max-w-md my-auto z-10"
       >
-        <Card className="border-white/10 bg-black/45 backdrop-blur-md shadow-2xl text-white">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-              3D Travel Diary
+        <Card className="border-[#ECE7E0] bg-white shadow-xl shadow-[#ECE7E0]/40 rounded-2xl p-2">
+          <CardHeader className="space-y-2 text-center pb-6">
+            <div className="mx-auto w-10 h-10 rounded-full bg-[#FAF8F5] flex items-center justify-center border border-[#ECE7E0] text-lg">
+              🔑
+            </div>
+            <CardTitle className="font-serif text-3xl font-medium tracking-tight text-[#2D2C2A]">
+              Welcome Back
             </CardTitle>
-            <CardDescription className="text-neutral-400">
-              Sign in to your private map journal
+            <CardDescription className="text-xs font-light text-[#76736F] uppercase tracking-widest">
+              Sign in to your private diary
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-neutral-300">Email Address</Label>
+                <Label htmlFor="email" className="text-xs font-semibold text-[#76736F] uppercase tracking-wide">
+                  Email Address
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -74,33 +89,42 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/5 border-white/10 focus:border-purple-500 text-white placeholder:text-neutral-500"
+                  className="bg-[#FAF8F5] border-[#ECE7E0] focus:border-[#C87A53] text-[#2D2C2A] placeholder:text-[#9E9A95] rounded-xl h-11 transition-all duration-300"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-neutral-300">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-xs font-semibold text-[#76736F] uppercase tracking-wide">
+                    Password
+                  </Label>
+                </div>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/5 border-white/10 focus:border-purple-500 text-white"
+                  className="bg-[#FAF8F5] border-[#ECE7E0] focus:border-[#C87A53] text-[#2D2C2A] rounded-xl h-11 transition-all duration-300"
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="pt-4 pb-2">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-0 py-6 transition-all duration-300"
+                className="w-full bg-[#2D2C2A] hover:bg-[#C87A53] text-[#FAF8F5] py-6 rounded-full font-semibold tracking-wide transition-all duration-500 ease-out shadow-md"
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                {isLoading ? 'Entering...' : 'Enter Sanctuary'}
               </Button>
             </CardFooter>
           </form>
         </Card>
       </motion.div>
+
+      {/* Footer */}
+      <footer className="w-full py-4 text-center text-[10px] text-[#76736F] font-light z-10">
+        © 2026 Atsumu. Your journeys are encrypted and hosted privately.
+      </footer>
     </div>
   )
 }

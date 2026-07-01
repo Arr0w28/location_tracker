@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import Globe from 'react-globe.gl'
 import * as THREE from 'three'
 import { LocationRecord } from '@/hooks/useLocations'
@@ -103,16 +103,34 @@ export default function GlobeView({
     ])
   }, [visibleLocations])
 
-  // Adjust camera to focus on selected location
+  const currentLocation = useMemo(() => {
+    return visibleLocations[visibleLocations.length - 1] || null
+  }, [visibleLocations])
+
+  // Adjust camera to focus on current scrubber location
+  useEffect(() => {
+    if (currentLocation && globeRef.current) {
+      globeRef.current.pointOfView(
+        {
+          lat: currentLocation.latitude,
+          lng: currentLocation.longitude,
+          altitude: 0.7, // Zoom in closer to show the local region/city clearly
+        },
+        1800 // Slower, cinematic camera glide
+      )
+    }
+  }, [currentLocation])
+
+  // Adjust camera to focus on selected location (clicked pin)
   useEffect(() => {
     if (selectedLocation && globeRef.current) {
       globeRef.current.pointOfView(
         {
           lat: selectedLocation.latitude,
           lng: selectedLocation.longitude,
-          altitude: 1.4,
+          altitude: 0.5, // Very close intimate zoom for journaling
         },
-        1800
+        2000 // Slowest, most stable focus speed
       )
     }
   }, [selectedLocation])
@@ -199,26 +217,20 @@ export default function GlobeView({
     }
   }
 
-  // 5. Custom HTML Marker Creator
-  const createMarkerElement = (location: LocationRecord) => {
+  // 5. Custom HTML Marker Creator (Stable function, prevents DOM recreation)
+  const createMarkerElement = useCallback((location: LocationRecord) => {
     const el = document.createElement('div')
     el.className = 'cursor-pointer group relative'
+    el.style.pointerEvents = 'auto'
+    el.style.cursor = 'pointer'
+    el.setAttribute('data-marker-id', location.id)
 
-    const isSelected = selectedLocation?.id === location.id
-    
-    // Pulse ring + inner circle styling using Tailwind styles mapped to DOM elements
     el.innerHTML = `
-      <div class="relative flex items-center justify-center">
+      <div class="marker-inner-container relative flex items-center justify-center">
         <!-- Pulse ring -->
-        <span class="absolute inline-flex h-6 w-6 rounded-full ${
-          isSelected 
-            ? 'bg-yellow-400/40 animate-ping' 
-            : 'bg-indigo-500/20 group-hover:bg-indigo-500/40 transition-all duration-300'
-        }"></span>
+        <span class="marker-pulse-ring absolute inline-flex h-6 w-6 rounded-full bg-indigo-500/20 group-hover:bg-indigo-500/40 transition-all duration-300"></span>
         <!-- Inner dot -->
-        <span class="relative inline-flex rounded-full h-3.5 w-3.5 border border-white shadow-md ${
-          isSelected ? 'bg-yellow-400' : 'bg-indigo-500 group-hover:bg-indigo-400'
-        }"></span>
+        <span class="marker-inner-dot relative inline-flex rounded-full h-3.5 w-3.5 border border-white shadow-md bg-indigo-500 group-hover:bg-indigo-400"></span>
       </div>
     `
 
@@ -229,14 +241,44 @@ export default function GlobeView({
     })
 
     // Hover handlers for Polaroid hover state
-    el.addEventListener('mouseenter', () => onHoverLocation(location))
-    el.addEventListener('mouseleave', () => onHoverLocation(null))
+    el.addEventListener('mouseenter', (e) => {
+      e.stopPropagation()
+      onHoverLocation(location)
+    })
+    el.addEventListener('mouseleave', (e) => {
+      e.stopPropagation()
+      onHoverLocation(null)
+    })
 
     return el
-  }
+  }, [onSelectLocation, onHoverLocation])
+
+  // 6. Update marker classes dynamically when selectedLocation changes (prevents DOM rebuilding)
+  useEffect(() => {
+    const markers = document.querySelectorAll('[data-marker-id]')
+    markers.forEach((marker) => {
+      const id = marker.getAttribute('data-marker-id')
+      const isSelected = selectedLocation?.id === id
+      const pulseRing = marker.querySelector('.marker-pulse-ring')
+      const innerDot = marker.querySelector('.marker-inner-dot')
+
+      if (pulseRing && innerDot) {
+        if (isSelected) {
+          pulseRing.className = 'marker-pulse-ring absolute inline-flex h-6 w-6 rounded-full bg-yellow-400/40 animate-ping'
+          innerDot.className = 'marker-inner-dot relative inline-flex rounded-full h-3.5 w-3.5 border border-white shadow-md bg-yellow-400'
+        } else {
+          pulseRing.className = 'marker-pulse-ring absolute inline-flex h-6 w-6 rounded-full bg-indigo-500/20 group-hover:bg-indigo-500/40 transition-all duration-300'
+          innerDot.className = 'marker-inner-dot relative inline-flex rounded-full h-3.5 w-3.5 border border-white shadow-md bg-indigo-500 group-hover:bg-indigo-400'
+        }
+      }
+    })
+  }, [selectedLocation, visibleLocations])
 
   return (
-    <div className="relative w-full h-full">
+    <div 
+      className="relative w-full h-full"
+      onMouseLeave={() => onHoverLocation(null)}
+    >
       <Globe
         ref={globeRef}
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
